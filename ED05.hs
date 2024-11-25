@@ -13,49 +13,61 @@ infixl 7 :=>:
 infixl 8 :<=>:
 
 
--------------------- EJERCICIO 1 --------------------
+-- EJERCICIO 1 
 conjunto :: Eq a => [a] -> [a]
 conjunto [] = []
-conjunto (x:xs) = x conjunto [y|y = xs, y = x]
+conjunto (x:xs) = x : conjunto [y | y <- xs, y /= x]
 
 variables :: Formula -> [Var]
-variables (Atom var) = [var] 
-variables(Neg formula) = conjunto (variables formula)
-variables (formula_1 = formula 2) = conjunto (variables formula_1 variables formula_2)
-
------------------------------------------------------
-
--------------------- EJERCICIO 2 --------------------
+variables (Atom var) = [var]
+variables (Neg formula) = conjunto (variables formula)
+variables (formula1 :&: formula2) = conjunto (variables formula1 ++ variables formula2)
+variables (formula1 :|: formula2) = conjunto (variables formula1 ++ variables formula2)
+variables (formula1 :=>: formula2) = conjunto (variables formula1 ++ variables formula2)
+variables (formula1 :<=>: formula2) = conjunto (variables formula1 ++ variables formula2)
+-- EJERCICIO 2 
 negacion :: Formula -> Formula
-negacion _ = undefined
------------------------------------------------------
+negacion (Atom var) = Neg (Atom var)
+negacion (Neg formula) = formula
+negacion (formula1 :&: formula2) = Neg formula1 :|: Neg formula2
+negacion (formula1 :|: formula2) = Neg formula1 :&: Neg formula2
+negacion (formula1 :=>: formula2) = negacion (Neg formula1 :|: formula2)
+negacion (formula1 :<=>: formula2) = negacion ((formula1 :=>: formula2) :&: (formula2 :=>: formula1))
 
--------------------- EJERCICIO 3 --------------------
+
+
+-- EJERCICIO 3 
 equivalencia :: Formula -> Formula
-equivalencia _ = undefined
------------------------------------------------------
+equivalencia (Atom var) = Atom var
+equivalencia (Neg formula) = Neg (equivalencia formula)
+equivalencia (formula1 :&: formula2) = equivalencia formula1 :&: equivalencia formula2
+equivalencia (formula1 :|: formula2) = equivalencia formula1 :|: equivalencia formula2
+equivalencia (formula1 :=>: formula2) = Neg (equivalencia formula1) :|: equivalencia formula2
+equivalencia (formula1 :<=>: formula2) =
+    (Neg (equivalencia formula1) :|: equivalencia formula2) :&: (Neg (equivalencia formula2) :|: equivalencia formula1)
 
--------------------- EJERCICIO 4 --------------------
-interpretacion :: Formula -> [(Var,Bool)] -> Bool
-interpretacion _ = undefined
------------------------------------------------------
 
--------------------- EJERCICIO 5 --------------------
+
+-- EJERCICIO 4 
+interpretacion :: Formula -> [(Var, Bool)] -> Bool
+interpretacion _ =
+
+
+
+-- EJERCICIO 5 
 combinaciones :: Formula -> [[(Var,Bool)]]
-combinaciones _ = undefined
------------------------------------------------------
+combinaciones _ = 
 
--------------------- EJERCICIO 6 --------------------
-tablaDeVerdadCom :: Formula -> [[Var,Bool]] -> [([(Var,Bool)],Bool)]
+
+
+
+
+-- EJERCICIO 6 
+tablaDeVerdadCom :: Formula -> [[(Var, Bool)]] -> [([(Var, Bool)], Bool)]
 tablaDeVerdadCom formula [] = []
-tablaDeVerdadCom formula (x:xs) = (x,interpretacion formula x)
-                     :(tablaDeVerdadCom formula xs)
+tablaDeVerdadCom formula (x:xs) = (x, interpretacion formula x) 
+     : (tablaDeVerdadCom formula xs)
 
-
-
-tablaDeVerdad :: Formula -> [([(Var,Bool)],Bool)]
-tablaDeVerdad formula = tablaDeVerdad formula (combinaciones formula)
------------------------------------------------------
-
-
-
+tablaDeVerdad :: Formula -> [([(Var, Bool)], Bool)]
+tablaDeVerdad formula = tablaDeVerdadCom formula (
+    combinaciones formula)
