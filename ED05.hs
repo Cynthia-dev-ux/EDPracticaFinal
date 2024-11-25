@@ -25,6 +25,8 @@ variables (formula1 :&: formula2) = conjunto (variables formula1 ++ variables fo
 variables (formula1 :|: formula2) = conjunto (variables formula1 ++ variables formula2)
 variables (formula1 :=>: formula2) = conjunto (variables formula1 ++ variables formula2)
 variables (formula1 :<=>: formula2) = conjunto (variables formula1 ++ variables formula2)
+
+
 -- EJERCICIO 2 
 negacion :: Formula -> Formula
 negacion (Atom var) = Neg (Atom var)
@@ -49,14 +51,32 @@ equivalencia (formula1 :<=>: formula2) =
 
 
 -- EJERCICIO 4 
-interpretacion :: Formula -> [(Var, Bool)] -> Bool
-interpretacion _ =
+-- Buscar la interpretación de una variable en una lista de asignaciones
+buscarInterpretacionVariable :: Var -> [(Var, Bool)] -> Bool
+buscarInterpretacionVariable v ((x, b):xs) = if v == x then b else buscarInterpretacionVariable v xs
+buscarInterpretacionVariable _ [] = False
 
+-- Interpretación de una fórmula lógica
+interpretacion :: Formula -> [(Var, Bool)] -> Bool
+interpretacion (Atom v) xs = buscarInterpretacionVariable v xs
+interpretacion (Neg t) xs = not (interpretacion t xs)
+interpretacion (p :|: q) xs = (interpretacion p xs) || (interpretacion q xs)
+interpretacion (p :&: q) xs = (interpretacion p xs) && (interpretacion q xs)
+interpretacion (p :=>: q) xs = not (interpretacion p xs) || (interpretacion q xs)
+interpretacion (p :<=>: q) xs = (interpretacion p xs) == (interpretacion q xs)
 
 
 -- EJERCICIO 5 
+agregar :: a -> [[a]] -> [[a]]
+agregar x [] = []
+agregar x (y:ys) =  ((x:y):agregar x ys)
+
+aux :: [Var] -> [[(Var,Bool)]]
+aux [x] = [[(x,True)], [(x,False)]]
+aux (x:xs) = (agregar (x,True) (aux xs)) ++ (agregar (x,False) (aux xs))
+
 combinaciones :: Formula -> [[(Var,Bool)]]
-combinaciones _ = 
+combinaciones p  = aux(variables p)
 
 
 
@@ -69,5 +89,4 @@ tablaDeVerdadCom formula (x:xs) = (x, interpretacion formula x)
      : (tablaDeVerdadCom formula xs)
 
 tablaDeVerdad :: Formula -> [([(Var, Bool)], Bool)]
-tablaDeVerdad formula = tablaDeVerdadCom formula (
-    combinaciones formula)
+tablaDeVerdad formula = tablaDeVerdadCom formula (combinaciones formula)
