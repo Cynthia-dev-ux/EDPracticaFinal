@@ -48,7 +48,6 @@ equivalencia (formula1 :<=>: formula2) =
     (Neg (equivalencia formula1) :|: equivalencia formula2) :&: (Neg (equivalencia formula2) :|: equivalencia formula1)
 
 
-
 -- EJERCICIO 4 
 -- Buscar la interpretación de una variable en una lista de asignaciones
 buscarInterpretacionVariable :: Var -> [(Var, Bool)] -> Bool
@@ -77,9 +76,6 @@ funcionaux (x:xs) = (agregar (x,False) (funcionaux xs)) ++ (agregar (x,True) (fu
 
 combinaciones :: Formula -> [[(Var,Bool)]]
 combinaciones p  = funcionaux(variables p)
-
-
-
 
 
 -- EJERCICIO 6 
