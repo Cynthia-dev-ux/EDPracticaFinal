@@ -65,27 +65,29 @@ interpretacion (p :=>: q) xs = not (interpretacion p xs) || (interpretacion q xs
 interpretacion (p :<=>: q) xs = (interpretacion p xs) == (interpretacion q xs)
 
 
--- EJERCICIO 5 
+-- EJERCICIO 5 --
+-- Función auxiliar agregar para la función combinaciones 
 agregar :: a -> [[a]] -> [[a]]
 agregar x [] = []
 agregar x (y:ys) =  ((x:y):agregar x ys)
 
-aux :: [Var] -> [[(Var,Bool)]]
-aux [x] = [[(x,False)], [(x,True)]]
-aux (x:xs) = (agregar (x,False) (aux xs)) ++ (agregar (x,True) (aux xs))
+funcionaux :: [Var] -> [[(Var,Bool)]]
+funcionaux [x] = [[(x,False)], [(x,True)]]
+funcionaux (x:xs) = (agregar (x,False) (funcionaux xs)) ++ (agregar (x,True) (funcionaux xs))
 
 combinaciones :: Formula -> [[(Var,Bool)]]
-combinaciones p  = aux(variables p)
+combinaciones p  = funcionaux(variables p)
 
 
 
 
 
 -- EJERCICIO 6 
-tablaDeVerdadCom :: Formula -> [[(Var, Bool)]] -> [([(Var, Bool)], Bool)]
-tablaDeVerdadCom formula [] = []
-tablaDeVerdadCom formula (x:xs) = (x, interpretacion formula x) 
-     : (tablaDeVerdadCom formula xs)
+-- Función auxiliar para poder generar tabla de verdad, que basicamente asigna valores true o false
+tablaDeVerdadAuxiliar :: Formula -> [[(Var, Bool)]] -> [([(Var, Bool)], Bool)]
+tablaDeVerdadAuxiliar formula [] = []
+tablaDeVerdadAuxiliar formula (x:xs) = (x, interpretacion formula x) 
+     : (tablaDeVerdadAuxiliar formula xs)
 
 tablaDeVerdad :: Formula -> [([(Var, Bool)], Bool)]
-tablaDeVerdad formula = tablaDeVerdadCom formula (combinaciones formula)
+tablaDeVerdad formula = tablaDeVerdadAuxiliar formula (combinaciones formula)
