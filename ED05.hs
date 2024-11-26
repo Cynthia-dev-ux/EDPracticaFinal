@@ -1,17 +1,16 @@
-data Var = A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z deriving (Show, Eq, Ord)
+data Var = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z    deriving (Show, Eq, Ord)
 
 data Formula = Atom Var
-               |Neg Formula
-               |Formula :&: Formula
-               |Formula :|: Formula
-               |Formula :=>: Formula
-               |Formula :<=>: Formula deriving (Show, Eq, Ord)
+             | Neg Formula
+             | Formula :&: Formula
+             | Formula :|: Formula
+             | Formula :=>: Formula
+             | Formula :<=>: Formula    deriving (Show, Eq, Ord)
 
 infixl 9 :&:
 infixl 9 :|:
 infixl 7 :=>:
 infixl 8 :<=>:
-
 
 -- EJERCICIO 1 
 conjunto :: Eq a => [a] -> [a]
@@ -72,8 +71,8 @@ agregar x [] = []
 agregar x (y:ys) =  ((x:y):agregar x ys)
 
 aux :: [Var] -> [[(Var,Bool)]]
-aux [x] = [[(x,True)], [(x,False)]]
-aux (x:xs) = (agregar (x,True) (aux xs)) ++ (agregar (x,False) (aux xs))
+aux [x] = [[(x,False)], [(x,True)]]
+aux (x:xs) = (agregar (x,False) (aux xs)) ++ (agregar (x,True) (aux xs))
 
 combinaciones :: Formula -> [[(Var,Bool)]]
 combinaciones p  = aux(variables p)
